@@ -2,6 +2,29 @@
 
 @import "tailwindcss";
 
+@theme {
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-glow: var(--accent-glow);
+  --color-primary: var(--primary);
+  --color-primary-soft: var(--primary-soft);
+  --color-base: var(--base);
+  --color-panel: var(--panel);
+  --color-panel-soft: var(--panel-soft);
+  --color-text: var(--text);
+  --color-text-muted: var(--text-muted);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-border-glow: var(--border-glow);
+  
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+  --shadow-xl: var(--shadow-xl);
+}
+
+
 @layer base {
   :root {
     /* Gourmet Culinary Branding System - Light Sand Palette */
@@ -122,10 +145,22 @@
   /* Main Container */
   .app-shell {
     min-height: 100vh;
-    padding: 6.5rem 2rem 3rem;
+    padding: 5rem 0.5rem 2rem;
     width: 100%;
     max-width: 100%;
     animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @media (min-width: 768px) {
+    .app-shell {
+      padding: 6.5rem 1rem 3rem;
+    }
+  }
+
+  @media (min-width: 1200px) {
+    .app-shell {
+      padding: 6.5rem 1.5rem 3rem;
+    }
   }
 
   /* Luxurious card panel with glass reflection and soft shadow */
@@ -383,4 +418,30 @@
 .border-border {
   border-color: var(--border) !important;
 }
+
+/* Utility to hide scrollbars */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Floating Toast Notification Animation */
+.animate-toast {
+  animation: toastUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes toastUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
 

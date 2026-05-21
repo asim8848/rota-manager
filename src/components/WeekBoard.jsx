@@ -117,7 +117,7 @@ const WeekBoard = ({
               Daily Operations Notes Drawer
             </span>
             {totalNotesCount > 0 ? (
-              <span className="text-[10px] bg-accent text-white font-black px-2.5 py-0.5 rounded-full shadow-sm">
+              <span className="text-[10px] bg-[var(--accent)] text-white font-black px-2.5 py-0.5 rounded-full shadow-sm whitespace-nowrap inline-flex items-center shrink-0">
                 {totalNotesCount} active notes
               </span>
             ) : null}
@@ -231,14 +231,14 @@ const WeekBoard = ({
 
       {/* Horizontally Scrollable Matrix Calendar Grid */}
       <div className="overflow-x-auto rounded-2xl border border-border bg-panel shadow-md">
-        <table className="w-full min-w-[1000px] border-collapse text-left text-xs">
+        <table className="w-full min-w-[1170px] sm:min-w-[1290px] border-collapse text-left text-xs">
           <thead>
             <tr className="bg-[#28211E] dark:bg-[#1C1715] text-white border-b border-border/80 select-none">
-              <th className="px-5 py-4 font-black text-white font-title text-sm tracking-tight border-r border-border/60 sticky left-0 bg-[#28211E] dark:bg-[#1C1715] backdrop-blur z-10 w-[200px] shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
+              <th className="px-2.5 sm:px-5 py-4 font-black text-white font-title text-xs sm:text-sm tracking-tight border-r border-border/60 sticky left-0 bg-[#28211E] dark:bg-[#1C1715] backdrop-blur z-10 w-[120px] min-w-[120px] max-w-[120px] sm:w-[170px] sm:min-w-[170px] sm:max-w-[170px] shadow-[4px_0_12px_-4px_rgba(0,0,0,0.08)]">
                 Team Member
               </th>
               {week.map((day) => (
-                <th key={day.id} className="px-5 py-4 border-r border-border/40 text-center relative group/dayheader text-white">
+                <th key={day.id} className="px-2.5 sm:px-5 py-4 border-r border-border/40 text-center relative group/dayheader text-white w-[150px] min-w-[150px] sm:w-[160px] sm:min-w-[160px]">
                   <div className="flex flex-col items-center gap-1">
                     <span className="font-black text-white font-title text-base tracking-tight">{day.name}</span>
                     <button
@@ -265,13 +265,13 @@ const WeekBoard = ({
                   className="hover:bg-panel-soft/10 transition-all duration-150 group/row"
                 >
                   {/* Sticky left Employee Column */}
-                  <td className="px-5 py-4 border-r border-border/60 sticky left-0 bg-panel shadow-[5px_0_12px_-6px_rgba(0,0,0,0.04)] z-10 w-[200px]">
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="font-extrabold text-text text-sm truncate max-w-[120px] tracking-tight flex items-center gap-1.5" title={member}>
-                        <UserIcon className="w-3.5 h-3.5 text-text-muted/70 shrink-0" />
+                  <td className="px-2.5 sm:px-5 py-4 border-r border-border/60 sticky left-0 bg-panel shadow-[5px_0_12px_-6px_rgba(0,0,0,0.04)] z-10 w-[120px] min-w-[120px] max-w-[120px] sm:w-[170px] sm:min-w-[170px] sm:max-w-[170px]">
+                    <div className="flex items-center justify-between gap-1.5">
+                      <span className="font-extrabold text-text text-xs sm:text-sm truncate max-w-[55px] sm:max-w-[100px] tracking-tight flex items-center gap-1" title={member}>
+                        <UserIcon className="w-3 h-3 text-text-muted/70 shrink-0" />
                         <span>{member}</span>
                       </span>
-                      <span className="tag text-[9.5px] font-black px-2 py-0.5 bg-accent-soft text-accent border border-accent/15 rounded-md shrink-0 shadow-sm">
+                      <span className="tag text-[9px] sm:text-[9.5px] font-black px-1.5 sm:px-2 py-0.5 bg-accent-soft text-accent border border-accent/15 rounded-md shrink-0 shadow-sm">
                         {weeklyHours.toFixed(1)}h
                       </span>
                     </div>
@@ -285,7 +285,7 @@ const WeekBoard = ({
                       <td
                         key={`${member}-${day.id}`}
                         onClick={() => setEditingCell({ employee: member, dayId: day.id })}
-                        className="px-4 py-4 border-r border-border/30 hover:bg-[rgba(var(--accent-rgb),0.02)] transition-all duration-300 cursor-pointer relative group/cell"
+                        className="px-2.5 sm:px-4 py-4 border-r border-border/30 hover:bg-[rgba(var(--accent-rgb),0.02)] transition-all duration-300 cursor-pointer relative group/cell w-[150px] min-w-[150px] sm:w-[160px] sm:min-w-[160px]"
                         style={{ verticalAlign: 'top', minHeight: '110px' }}
                       >
                         <div className="flex flex-col gap-2 min-h-[75px] justify-between h-full">
@@ -359,24 +359,24 @@ const WeekBoard = ({
         const assignments = day ? getCellAssignments(day, editingCell.employee) : []
         
         return (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/45 dark:bg-black/70 backdrop-blur-[6px] transition-all">
-            <div className="panel bg-panel border-accent/20 max-w-lg w-full p-6 shadow-2xl relative flex flex-col gap-5 max-h-[90vh] overflow-y-auto z-50 animate-scale-up">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/45 dark:bg-black/70 backdrop-blur-[6px] transition-all">
+            <div className="panel bg-panel border-accent/20 max-w-md sm:max-w-lg w-full p-4 sm:p-6 shadow-2xl relative flex flex-col gap-3.5 sm:gap-5 max-h-[85vh] overflow-y-auto z-50 animate-scale-up">
               
               {/* Header */}
-              <div className="flex items-start justify-between border-b border-border/60 pb-3.5">
+              <div className="flex items-start justify-between border-b border-border/60 pb-3 sm:pb-3.5">
                 <div>
-                  <h3 className="text-xl font-black tracking-tight text-text font-title flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5 text-accent shrink-0" />
+                  <h3 className="text-lg sm:text-xl font-black tracking-tight text-text font-title flex items-center gap-2">
+                    <CalendarIcon className="w-4.5 h-4.5 sm:w-5 sm:h-5 text-accent shrink-0" />
                     <span>Manage Schedule</span>
                   </h3>
-                  <p className="text-xs text-text-muted font-bold mt-1.5 flex flex-wrap items-center gap-2">
-                    <span className="bg-accent-soft text-accent px-2 py-0.5 rounded font-black flex items-center gap-1">
-                      <UserIcon className="w-3 h-3 text-accent shrink-0" />
+                  <p className="text-[11px] sm:text-xs text-text-muted font-bold mt-1 sm:mt-1.5 flex flex-wrap items-center gap-1.5 sm:gap-2">
+                    <span className="bg-accent-soft text-accent px-1.5 sm:px-2 py-0.5 rounded font-black flex items-center gap-1">
+                      <UserIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-accent shrink-0" />
                       <span>{editingCell.employee}</span>
                     </span>
                     <span className="text-border">|</span>
-                    <span className="bg-panel-soft text-text px-2 py-0.5 rounded font-black flex items-center gap-1">
-                      <CalendarIcon className="w-3 h-3 text-text-muted shrink-0" />
+                    <span className="bg-panel-soft text-text px-1.5 sm:px-2 py-0.5 rounded font-black flex items-center gap-1">
+                      <CalendarIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-text-muted shrink-0" />
                       <span>{day?.name}</span>
                     </span>
                   </p>
@@ -384,34 +384,34 @@ const WeekBoard = ({
                 <button
                   type="button"
                   onClick={() => setEditingCell(null)}
-                  className="px-3 py-1.5 rounded-lg text-text-muted hover:text-text hover:bg-panel-soft/80 border border-border/60 transition-all text-xs font-black cursor-pointer shadow-sm"
+                  className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-text-muted hover:text-text hover:bg-panel-soft/80 border border-border/60 transition-all text-xs font-black cursor-pointer shadow-sm"
                 >
                   ✕ Close
                 </button>
               </div>
 
               {/* List of Active Roles for this day */}
-              <div className="flex flex-col gap-3">
-                <h4 className="text-[10px] font-black text-text-muted uppercase tracking-widest border-b border-border/40 pb-2">
+              <div className="flex flex-col gap-2.5 sm:gap-3">
+                <h4 className="text-[9.5px] sm:text-[10px] font-black text-text-muted uppercase tracking-widest border-b border-border/40 pb-1.5 sm:pb-2">
                   Active Scheduled Roles ({assignments.length})
                 </h4>
 
                 {assignments.length === 0 ? (
-                  <p className="text-xs text-text-muted/80 italic text-center py-6 bg-panel-soft/30 rounded-xl border border-dashed border-border">
+                  <p className="text-xs text-text-muted/80 italic text-center py-5 sm:py-6 bg-panel-soft/30 rounded-xl border border-dashed border-border">
                     Not scheduled to work on this day. Use the form below to assign shifts.
                   </p>
                 ) : null}
 
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5 sm:gap-3">
                   {assignments.map((assignment, index) => (
                     <div
                       key={assignment.entryId}
-                      className="p-4 rounded-xl border border-border bg-panel-soft/40 flex flex-col gap-3.5 shadow-sm relative transition-all hover:bg-panel"
+                      className="p-3 sm:p-4 rounded-xl border border-border bg-panel-soft/40 flex flex-col gap-2.5 sm:gap-3 shadow-sm relative transition-all hover:bg-panel"
                       style={{
                         borderLeft: `4px solid ${getStationColor(assignment.station)}`,
                       }}
                     >
-                      <div className="flex items-center justify-between border-b border-border-soft pb-2">
+                      <div className="flex items-center justify-between border-b border-border-soft pb-1.5 sm:pb-2">
                         <span className="text-xs font-black text-text flex items-center gap-1.5">
                           <span className="text-xs">{getStationIcon(assignment.station)}</span>
                           Role #{index + 1} ({assignment.station})
@@ -422,16 +422,16 @@ const WeekBoard = ({
                           onClick={() => {
                             onRemoveCellAssignment(day.id, assignment.shiftId, assignment.entryId, editingCell.employee)
                           }}
-                          className="text-[10.5px] text-primary hover:bg-primary/5 hover:border-primary/20 border border-transparent px-2.5 py-1 rounded-lg font-black transition-all cursor-pointer shadow-sm flex items-center gap-1"
+                          className="text-[10px] sm:text-[10.5px] text-primary hover:bg-primary/5 hover:border-primary/20 border border-transparent px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg font-black transition-all cursor-pointer shadow-sm flex items-center gap-1"
                         >
                           <TrashIcon className="w-3 h-3 text-primary shrink-0" />
                           <span>Remove Role</span>
                         </button>
                       </div>
 
-                      <div className="grid gap-3 text-xs">
-                        <div className="grid grid-cols-[100px_1fr] items-center gap-3">
-                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Station</span>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                        <div className="flex flex-col gap-1">
+                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Station</span>
                           <select
                             value={assignment.station}
                             onChange={(e) => {
@@ -443,7 +443,7 @@ const WeekBoard = ({
                                 { station: e.target.value }
                               )
                             }}
-                            className="input py-1.5 text-xs bg-panel shadow-sm cursor-pointer border font-bold"
+                            className="input py-1 px-1.5 text-xs bg-panel shadow-sm cursor-pointer border font-bold"
                           >
                             {stations.map((station) => (
                               <option key={station} value={station}>
@@ -453,8 +453,8 @@ const WeekBoard = ({
                           </select>
                         </div>
 
-                        <div className="grid grid-cols-[100px_1fr] items-center gap-3">
-                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Hours</span>
+                        <div className="flex flex-col gap-1">
+                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Hours</span>
                           <input
                             value={assignment.time}
                             onChange={(e) => {
@@ -466,12 +466,12 @@ const WeekBoard = ({
                                 { time: e.target.value }
                               )
                             }}
-                            className="input py-1.5 text-xs bg-panel shadow-sm font-black border"
+                            className="input py-1 px-1.5 text-xs bg-panel shadow-sm font-black border"
                           />
                         </div>
 
-                        <div className="grid grid-cols-[100px_1fr] items-center gap-3">
-                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Note</span>
+                        <div className="flex flex-col gap-1 sm:col-span-2">
+                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Note</span>
                           <input
                             value={assignment.note}
                             onChange={(e) => {
@@ -483,7 +483,7 @@ const WeekBoard = ({
                                 { note: e.target.value }
                               )
                             }}
-                            className="input py-1.5 text-xs bg-panel shadow-sm border font-medium"
+                            className="input py-1 px-1.5 text-xs bg-panel shadow-sm border font-medium"
                             placeholder="Optional role note (e.g. registers, kitchen cleaning)..."
                           />
                         </div>
@@ -494,18 +494,18 @@ const WeekBoard = ({
               </div>
 
               {/* Form to Schedule a new/split shift role */}
-              <div className="border-t border-border/60 pt-4 flex flex-col gap-4">
-                <h4 className="text-[10px] font-black text-text-muted uppercase tracking-widest">
+              <div className="border-t border-border/60 pt-3 sm:pt-4 flex flex-col gap-3 sm:gap-4">
+                <h4 className="text-[9.5px] sm:text-[10px] font-black text-text-muted uppercase tracking-widest">
                   + Add New Assignment / Split Shift
                 </h4>
 
-                <div className="grid gap-3.5 text-xs">
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Station Role</span>
+                <div className="grid grid-cols-2 gap-2.5 sm:gap-3 text-xs">
+                  <div className="flex flex-col gap-1">
+                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Station Role</span>
                     <select
                       value={newStation}
                       onChange={(e) => setNewStation(e.target.value)}
-                      className="input py-2 text-xs bg-panel cursor-pointer shadow-sm border font-bold"
+                      className="input py-1.5 px-2 text-xs bg-panel cursor-pointer shadow-sm border font-bold"
                     >
                       {stations.map((station) => (
                         <option key={station} value={station}>
@@ -515,37 +515,40 @@ const WeekBoard = ({
                     </select>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Shift Hours / Timing</span>
+                  <div className="flex flex-col gap-1">
+                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Shift Hours / Timing</span>
                     <input
                       value={newTime}
                       onChange={(e) => setNewTime(e.target.value)}
-                      className="input py-2 text-xs bg-panel shadow-sm border font-black"
+                      className="input py-1.5 px-2 text-xs bg-panel shadow-sm border font-black"
                       placeholder="e.g. 12pm-6pm, 9am-9pm"
                     />
+                  </div>
 
-                    {/* Time presets quick action pills */}
-                    <div className="flex flex-wrap gap-1.5 mt-1">
+                  <div className="flex flex-col gap-1 col-span-2">
+                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Timing Presets</span>
+                    {/* Time presets quick action pills in a horizontally scrollable container */}
+                    <div className="flex flex-nowrap overflow-x-auto gap-1.5 pb-1 mt-0.5 scrollbar-none">
                       {timePresets.map((preset) => (
                         <button
                           key={preset.label}
                           type="button"
                           onClick={() => setNewTime(preset.value)}
-                          className="px-2.5 py-1 bg-panel-soft hover:bg-accent-soft text-[9.5px] font-black border border-border hover:border-accent/40 rounded-lg text-text hover:text-accent shadow-sm transition-all cursor-pointer flex items-center gap-1"
+                          className="px-2 sm:px-2.5 py-1 bg-panel-soft hover:bg-accent-soft text-[9.5px] font-black border border-border hover:border-accent/40 rounded-lg text-text hover:text-accent shadow-sm transition-all cursor-pointer flex items-center gap-1 shrink-0 whitespace-nowrap"
                         >
                           <ClockIcon className="w-2.5 h-2.5 shrink-0" />
-                          <span>{preset.label} ({preset.value})</span>
+                          <span>{preset.label}</span>
                         </button>
                       ))}
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-1.5">
-                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[10px]">Optional Note</span>
+                  <div className="flex flex-col gap-1 col-span-2">
+                    <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Optional Note</span>
                     <input
                       value={newNote}
                       onChange={(e) => setNewNote(e.target.value)}
-                      className="input py-2 text-xs bg-panel shadow-sm border font-medium"
+                      className="input py-1.5 px-2 text-xs bg-panel shadow-sm border font-medium"
                       placeholder="e.g. keyholder, registers, top up..."
                     />
                   </div>
@@ -554,7 +557,7 @@ const WeekBoard = ({
                 <button
                   type="button"
                   onClick={() => handleAddAssignment(day.id, editingCell.employee)}
-                  className="btn btn-primary text-xs w-full py-3 flex items-center justify-center gap-2 mt-2 shadow-md"
+                  className="btn btn-primary text-xs w-full py-2.5 flex items-center justify-center gap-2 mt-1 sm:mt-1.5 shadow-md"
                 >
                   <PlusIcon className="w-4 h-4 text-white shrink-0" />
                   <span>Add Assignment to Schedule</span>
@@ -562,11 +565,11 @@ const WeekBoard = ({
               </div>
 
               {/* Footer Actions */}
-              <div className="border-t border-border/50 pt-3.5 flex justify-end">
+              <div className="border-t border-border/50 pt-3 sm:pt-3.5 flex justify-end">
                 <button
                   type="button"
                   onClick={() => setEditingCell(null)}
-                  className="btn text-xs px-5 py-2 font-black cursor-pointer"
+                  className="btn text-xs px-4 sm:px-5 py-1.5 sm:py-2 font-black cursor-pointer"
                 >
                   Done & Close
                 </button>
