@@ -1,0 +1,386 @@
+@import url('https://fonts.googleapis.com/css2?family=Karla:wght@300;400;500;600;700;800&family=Playfair+Display+SC:wght@400;700;900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* Gourmet Culinary Branding System - Light Sand Palette */
+    --base: #DFDAD4; /* Creamy Sand Clay background */
+    --panel: rgba(250, 248, 245, 0.94); /* Warm eggshell cream panel */
+    --panel-soft: rgba(234, 229, 222, 0.92); /* Fine roasted oatmeal concrete overlay */
+    --text: #28211E; /* Smoky dark roasted coffee (excellent text contrast 8.5:1) */
+    --text-muted: #61524A; /* Earthy charcoal roasted ash */
+    --muted: #7D6C62; /* Soft clay earth */
+    --accent: #D44B27; /* Zesty Pepper Orange */
+    --accent-rgb: 212, 75, 39;
+    --accent-soft: rgba(212, 75, 39, 0.08);
+    --accent-glow: rgba(212, 75, 39, 0.15);
+    --primary: #DC3232; /* Rich Smoke Red */
+    --primary-rgb: 220, 50, 50;
+    --primary-soft: rgba(220, 50, 50, 0.07);
+    
+    --border: rgba(40, 33, 30, 0.11);
+    --border-soft: rgba(40, 33, 30, 0.06);
+    --border-glow: rgba(212, 75, 39, 0.25);
+    
+    /* Harmonious shadows tinted with warm clay hues */
+    --shadow-sm: 0 2px 4px 0 rgba(40, 33, 30, 0.03);
+    --shadow-md: 0 4px 10px -2px rgba(40, 33, 30, 0.06), 0 2px 4px -2px rgba(40, 33, 30, 0.04);
+    --shadow-lg: 0 12px 24px -4px rgba(40, 33, 30, 0.07), 0 4px 12px -4px rgba(40, 33, 30, 0.05), 0 0 0 1px rgba(40, 33, 30, 0.01);
+    --shadow-xl: 0 25px 45px -8px rgba(40, 33, 30, 0.12), 0 10px 20px -8px rgba(40, 33, 30, 0.08);
+    
+    --backdrop: blur(20px);
+    
+    /* High-end Restaurant Editorial Fonts */
+    --font-title: 'Playfair Display SC', 'Playfair Display', 'Georgia', serif;
+    --font-sans: 'Karla', 'Inter', -apple-system, sans-serif;
+    color-scheme: light;
+  }
+
+  :root.dark {
+    /* Gourmet Culinary Branding System - Dark Smoky Charcoal */
+    --base: #141110; /* Dark seared charcoal backdrop */
+    --panel: rgba(28, 23, 21, 0.95); /* Roasted wood panel */
+    --panel-soft: rgba(43, 36, 33, 0.9); /* Warm ash charcoal overlay */
+    --text: #F7F5F2; /* Clean culinary eggshell white */
+    --text-muted: #C0B4AC; /* Light flour dust ash */
+    --muted: #9E8E84; /* Soft warm wood smoke grey */
+    --accent: #E2583E; /* High-contrast vivid pepper orange */
+    --accent-rgb: 226, 88, 62;
+    --accent-soft: rgba(226, 88, 62, 0.15);
+    --accent-glow: rgba(226, 88, 62, 0.25);
+    --primary: #EF4444; /* Vivid cherry red */
+    --primary-rgb: 239, 68, 68;
+    --primary-soft: rgba(239, 68, 68, 0.12);
+    
+    --border: rgba(247, 245, 242, 0.09);
+    --border-soft: rgba(247, 245, 242, 0.04);
+    --border-glow: rgba(226, 88, 62, 0.35);
+    
+    --shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.6);
+    --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5), 0 2px 6px -2px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 16px 28px -4px rgba(0, 0, 0, 0.6), 0 6px 14px -4px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.02);
+    --shadow-xl: 0 32px 50px -10px rgba(0, 0, 0, 0.7), 0 14px 24px -8px rgba(0, 0, 0, 0.6);
+    color-scheme: dark;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.6;
+    background: var(--base);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    /* Appetizing ambient light reflections */
+    background-image: 
+      radial-gradient(at 0% 0%, rgba(var(--accent-rgb), 0.06) 0px, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(var(--primary-rgb), 0.04) 0px, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(245, 158, 11, 0.04) 0px, transparent 40%);
+    background-attachment: fixed;
+    transition: background-color 0.4s cubic-bezier(0.16, 1, 0.3, 1), color 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-title);
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    text-wrap: pretty;
+  }
+  
+  /* Tactile focus states for keyboard accessibility navigation */
+  *:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(var(--accent-rgb), 0.2);
+  }
+  
+  /* Elegant rounded custom scrollbars */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 9999px;
+    transition: background-color 0.2s;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--accent);
+  }
+}
+
+@layer components {
+  /* Main Container */
+  .app-shell {
+    min-height: 100vh;
+    padding: 6.5rem 2rem 3rem;
+    width: 100%;
+    max-width: 100%;
+    animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  /* Luxurious card panel with glass reflection and soft shadow */
+  .panel {
+    border-radius: 16px; /* High-end rounded corner */
+    border: 1px solid var(--border);
+    background: var(--panel);
+    backdrop-filter: var(--backdrop);
+    -webkit-backdrop-filter: var(--backdrop);
+    box-shadow: var(--shadow-lg);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .panel::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    pointer-events: none;
+    border: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  .panel:hover {
+    border-color: rgba(var(--accent-rgb), 0.18);
+    box-shadow: var(--shadow-xl);
+    transform: translateY(-2px);
+  }
+
+  .panel:hover::after {
+    border-color: var(--border-glow);
+  }
+
+  /* Semi-transparent panel overlays */
+  .soft-panel {
+    border-radius: 12px;
+    background: var(--panel-soft);
+    border: 1px solid var(--border-soft);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  
+  .soft-panel:hover {
+    border-color: rgba(var(--accent-rgb), 0.15);
+    background: var(--panel);
+  }
+
+  /* Premium Buttons */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    border-radius: 10px; /* Modern squircle shape */
+    border: 1px solid var(--border);
+    padding: 0.6rem 1.35rem;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--text);
+    background: var(--panel);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: var(--shadow-sm);
+    user-select: none;
+  }
+
+  .btn:hover:not(:disabled) {
+    background: var(--panel-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  .btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+
+  /* Core Accent Button (Smoke Red) */
+  .btn-primary {
+    background: var(--primary);
+    color: #ffffff;
+    border-color: var(--primary);
+    box-shadow: 0 4px 14px -3px rgba(var(--primary-rgb), 0.3);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background: var(--primary);
+    color: #ffffff;
+    opacity: 0.92;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -3px rgba(var(--primary-rgb), 0.45);
+    border-color: var(--primary);
+  }
+
+  /* Subtle Warm Accent Button */
+  .btn-soft {
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .btn-soft:hover:not(:disabled) {
+    background: var(--accent-soft);
+    opacity: 0.95;
+    transform: translateY(-1px);
+    border-color: rgba(var(--accent-rgb), 0.2);
+  }
+
+  /* Modern Pills and Tags */
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 6px;
+    padding: 0.3rem 0.75rem;
+    font-size: 11px;
+    font-weight: 800;
+    background: var(--accent-soft);
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border: 1px solid rgba(var(--accent-rgb), 0.12);
+  }
+
+  /* High fidelity premium inputs */
+  .input {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    padding: 0.65rem 0.95rem;
+    font-size: 14px;
+    color: var(--text);
+    outline: none;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.015);
+  }
+
+  .input:focus {
+    border-color: var(--accent);
+    background: var(--panel);
+    box-shadow: 0 0 0 4px var(--accent-glow), inset 0 2px 4px 0 rgba(0, 0, 0, 0.01);
+  }
+  
+  .input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.6;
+  }
+
+  /* Interactive Analytics Dashboard Cards */
+  .stat-card {
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-title {
+    font-size: 11px;
+    font-weight: 800;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 0.6rem;
+  }
+  
+  /* Ticket style shift badge representing a kitchen order card */
+  .order-ticket {
+    position: relative;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: var(--panel);
+    padding: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+  }
+  
+  .order-ticket:hover {
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: var(--shadow-md);
+    border-color: rgba(var(--accent-rgb), 0.25);
+  }
+}
+
+/* Stunning Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-down {
+  animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Explicit Gourmet Theme Helper Utilities */
+.text-text {
+  color: var(--text) !important;
+}
+.text-text-muted {
+  color: var(--text-muted) !important;
+}
+.text-accent {
+  color: var(--accent) !important;
+}
+.bg-panel {
+  background-color: var(--panel) !important;
+}
+.bg-panel-soft {
+  background-color: var(--panel-soft) !important;
+}
+.border-border {
+  border-color: var(--border) !important;
+}
+
