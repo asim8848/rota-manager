@@ -1,0 +1,41 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // ===============================================================
+    // Assumed Data Model & Validations
+    // ===============================================================
+    
+    // Check if the user is authenticated
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Rules
+    match /rotas/{weekId} {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated()
+                   && weekId.matches('^week_[0-9]{4}-W[0-9]{2}$')
+                   && request.resource.data.weekId is string
+                   && request.resource.data.employees is list
+                   && request.resource.data.stations is list
+                   && request.resource.data.week is list
+                   && (request.resource.data.updatedBy == request.auth.uid || request.resource.data.updatedBy == '');
+    }
+
+    match /suggestions/notes {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated()
+                   && (request.resource.data.openingNote is list || !('openingNote' in request.resource.data))
+                   && (request.resource.data.prepNote is list || !('prepNote' in request.resource.data))
+                   && (request.resource.data.extraNote is list || !('extraNote' in request.resource.data))
+                   && (request.resource.data.closingNote is list || !('closingNote' in request.resource.data));
+    }
+
+    match /metadata/settings {
+      allow read: if isAuthenticated();
+      allow write: if isAuthenticated()
+                   && request.resource.data.activeWeekId is string;
+    }
+  }
+}
+

@@ -1,11 +1,10 @@
-import { ClipboardIcon, CameraIcon, SunIcon, MoonIcon } from './Icons'
+import { SunIcon, MoonIcon } from './Icons'
 
 const Header = ({
   theme,
   onToggleTheme,
-  onCopyWeek,
-  onExportImage,
   status,
+  onLogout,
 }) => {
   return (
     <>
@@ -49,26 +48,6 @@ const Header = ({
           <div className="flex items-center gap-1.5 sm:gap-2">
             <button 
               type="button" 
-              onClick={onCopyWeek} 
-              className="btn btn-primary text-xs tracking-wide p-2 sm:px-4 sm:py-2.5 flex items-center justify-center shrink-0 cursor-pointer rounded-lg sm:rounded-xl"
-              title="Copy schedule message for WhatsApp"
-            >
-              <ClipboardIcon className="w-4 h-4 text-white" />
-              <span className="hidden sm:inline ml-1 text-white">Copy Schedule</span>
-            </button>
-            
-            <button 
-              type="button" 
-              onClick={onExportImage} 
-              className="btn text-xs tracking-wide font-semibold p-2 sm:px-4 sm:py-2.5 flex items-center justify-center shrink-0 cursor-pointer rounded-lg sm:rounded-xl"
-              title="Export Rota as PNG Image"
-            >
-              <CameraIcon className="w-4 h-4 text-text" />
-              <span className="hidden sm:inline ml-1 text-text">Save Image</span>
-            </button>
-            
-            <button 
-              type="button" 
               onClick={onToggleTheme} 
               className="btn btn-soft text-xs tracking-wide p-2 sm:px-3 sm:py-2.5 flex items-center justify-center shrink-0 cursor-pointer rounded-lg sm:rounded-xl"
               aria-label="Toggle theme"
@@ -76,6 +55,16 @@ const Header = ({
             >
               {theme === 'dark' ? <SunIcon className="w-4 h-4" /> : <MoonIcon className="w-4 h-4" />}
             </button>
+            {onLogout && (
+              <button 
+                type="button" 
+                onClick={onLogout} 
+                className="btn btn-soft border-red-500/10 hover:border-red-500/30 text-red-500 text-xs tracking-wide px-3 py-2 flex items-center justify-center cursor-pointer rounded-lg sm:rounded-xl font-bold"
+                title="Sign Out"
+              >
+                Sign Out
+              </button>
+            )}
           </div>
         </div>
       </header>

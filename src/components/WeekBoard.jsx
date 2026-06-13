@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import { createPortal } from 'react-dom'
 import { getStationColor, getStationIcon } from '../utils/stationColors'
-import { parseRangeToHours } from '../utils/rotaUtils'
+import { getMergedIntervalsHours, convert12hTo24h, convert24hTo12h } from '../utils/rotaUtils'
 import {
   NotesIcon,
   SunIcon,
@@ -21,12 +22,23 @@ const WeekBoard = ({
   stations,
   onUpdateDayNotes,
   onCopyDay,
+  onDuplicateEmployeeShifts,
   onAddCellAssignment,
   onUpdateCellAssignment,
   onRemoveCellAssignment,
+  suggestions = { openingNote: [], prepNote: [], extraNote: [], closingNote: [] }
 }) => {
   // Modal editor cell state: { employee: 'Name', dayId: 'monday' }
   const [editingCell, setEditingCell] = useState(null)
+  const [activeNoteFocus, setActiveNoteFocus] = useState(null)
+
+  // Duplicate employee shift states
+  const [duplicateSourceDayId, setDuplicateSourceDayId] = useState('')
+
+  const startEditingCell = (employee, dayId) => {
+    setDuplicateSourceDayId('')
+    setEditingCell(employee ? { employee, dayId } : null)
+  }
   
   // Tabbed operations notes state
   const [showNotes, setShowNotes] = useState(false)
@@ -53,18 +65,15 @@ const WeekBoard = ({
   const calculateEmployeeHours = (employeeName) => {
     let total = 0
     week.forEach((day) => {
+      const ranges = []
       day.shifts.forEach((shift) => {
         shift.entries.forEach((entry) => {
           if (entry.staff.includes(employeeName)) {
-            const hours = parseRangeToHours(entry.time || shift.time || '')
-            const shareCount =
-              entry.station === 'Till' && entry.staff.length > 1
-                ? entry.staff.length
-                : 1
-            total += hours / shareCount
+            ranges.push(entry.time || shift.time || '')
           }
         })
       })
+      total += getMergedIntervalsHours(ranges)
     })
     return total
   }
@@ -160,68 +169,152 @@ const WeekBoard = ({
             {/* Active Tab Note Inputs */}
             {activeNotesDay ? (
               <div className="grid gap-5 sm:grid-cols-2 text-xs">
-                <div className="flex flex-col gap-2">
+                {/* Opening Note */}
+                <div className="flex flex-col gap-2 relative">
                   <label className="font-extrabold text-text-muted uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                     <SunIcon className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Opening Note</span>
                   </label>
                   <textarea
-                    value={activeNotesDay.openingNote}
+                    value={activeNotesDay.openingNote || ''}
                     onChange={(event) =>
                       onUpdateDayNotes(activeNotesDay.id, { openingNote: event.target.value })
                     }
+                    onFocus={() => setActiveNoteFocus('openingNote')}
+                    onBlur={() => setTimeout(() => setActiveNoteFocus(prev => prev === 'openingNote' ? null : prev), 200)}
                     placeholder="e.g. 12pm opening please arrive at 11:50am. Ensure your stations are ready."
                     rows={2.5}
                     className="input min-h-[70px] resize-none"
                   />
+                  {activeNoteFocus === 'openingNote' && (suggestions.openingNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.openingNote || '').toLowerCase()) && s !== activeNotesDay.openingNote).length > 0 && (
+                    <div className="absolute z-50 left-0 right-0 top-[100%] mt-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-panel shadow-xl flex flex-col">
+                      {(suggestions.openingNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.openingNote || '').toLowerCase()) && s !== activeNotesDay.openingNote).map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            onUpdateDayNotes(activeNotesDay.id, { openingNote: suggestion })
+                            setActiveNoteFocus(null)
+                          }}
+                          className="px-3 py-2 text-left hover:bg-accent-soft hover:text-accent border-b border-border/40 last:border-b-0 cursor-pointer font-bold text-[10.5px] text-text"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Prep Note */}
+                <div className="flex flex-col gap-2 relative">
                   <label className="font-extrabold text-text-muted uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                     <ClockIcon className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Prep Note</span>
                   </label>
                   <textarea
-                    value={activeNotesDay.prepNote}
+                    value={activeNotesDay.prepNote || ''}
                     onChange={(event) =>
                       onUpdateDayNotes(activeNotesDay.id, { prepNote: event.target.value })
                     }
+                    onFocus={() => setActiveNoteFocus('prepNote')}
+                    onBlur={() => setTimeout(() => setActiveNoteFocus(prev => prev === 'prepNote' ? null : prev), 200)}
                     placeholder="e.g. Prep team please ensure burger station top up is in fridge."
                     rows={2.5}
                     className="input min-h-[70px] resize-none"
                   />
+                  {activeNoteFocus === 'prepNote' && (suggestions.prepNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.prepNote || '').toLowerCase()) && s !== activeNotesDay.prepNote).length > 0 && (
+                    <div className="absolute z-50 left-0 right-0 top-[100%] mt-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-panel shadow-xl flex flex-col">
+                      {(suggestions.prepNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.prepNote || '').toLowerCase()) && s !== activeNotesDay.prepNote).map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            onUpdateDayNotes(activeNotesDay.id, { prepNote: suggestion })
+                            setActiveNoteFocus(null)
+                          }}
+                          className="px-3 py-2 text-left hover:bg-accent-soft hover:text-accent border-b border-border/40 last:border-b-0 cursor-pointer font-bold text-[10.5px] text-text"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Extra Notes */}
+                <div className="flex flex-col gap-2 relative">
                   <label className="font-extrabold text-text-muted uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                     <AwardIcon className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Extra Notes</span>
                   </label>
                   <textarea
-                    value={activeNotesDay.extraNote}
+                    value={activeNotesDay.extraNote || ''}
                     onChange={(event) =>
                       onUpdateDayNotes(activeNotesDay.id, { extraNote: event.target.value })
                     }
+                    onFocus={() => setActiveNoteFocus('extraNote')}
+                    onBlur={() => setTimeout(() => setActiveNoteFocus(prev => prev === 'extraNote' ? null : prev), 200)}
                     placeholder="e.g. After 6pm if station needs anything please tell Wajahat."
                     rows={2.5}
                     className="input min-h-[70px] resize-none"
                   />
+                  {activeNoteFocus === 'extraNote' && (suggestions.extraNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.extraNote || '').toLowerCase()) && s !== activeNotesDay.extraNote).length > 0 && (
+                    <div className="absolute z-50 left-0 right-0 top-[100%] mt-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-panel shadow-xl flex flex-col">
+                      {(suggestions.extraNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.extraNote || '').toLowerCase()) && s !== activeNotesDay.extraNote).map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            onUpdateDayNotes(activeNotesDay.id, { extraNote: suggestion })
+                            setActiveNoteFocus(null)
+                          }}
+                          className="px-3 py-2 text-left hover:bg-accent-soft hover:text-accent border-b border-border/40 last:border-b-0 cursor-pointer font-bold text-[10.5px] text-text"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
-                <div className="flex flex-col gap-2">
+                {/* Closing Note */}
+                <div className="flex flex-col gap-2 relative">
                   <label className="font-extrabold text-text-muted uppercase tracking-wider text-[10px] flex items-center gap-1.5">
                     <MoonIcon className="w-3.5 h-3.5 text-accent shrink-0" />
                     <span>Closing Note</span>
                   </label>
                   <textarea
-                    value={activeNotesDay.closingNote}
+                    value={activeNotesDay.closingNote || ''}
                     onChange={(event) =>
                       onUpdateDayNotes(activeNotesDay.id, { closingNote: event.target.value })
                     }
+                    onFocus={() => setActiveNoteFocus('closingNote')}
+                    onBlur={() => setTimeout(() => setActiveNoteFocus(prev => prev === 'closingNote' ? null : prev), 200)}
                     placeholder="e.g. Sheram if staff are free after 11 get them to clean and help cleaning team till 12."
                     rows={2.5}
                     className="input min-h-[70px] resize-none"
                   />
+                  {activeNoteFocus === 'closingNote' && (suggestions.closingNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.closingNote || '').toLowerCase()) && s !== activeNotesDay.closingNote).length > 0 && (
+                    <div className="absolute z-50 left-0 right-0 top-[100%] mt-1 max-h-40 overflow-y-auto rounded-lg border border-border bg-panel shadow-xl flex flex-col">
+                      {(suggestions.closingNote || []).filter(s => s && s.toLowerCase().includes((activeNotesDay.closingNote || '').toLowerCase()) && s !== activeNotesDay.closingNote).map((suggestion, idx) => (
+                        <button
+                          key={idx}
+                          type="button"
+                          onMouseDown={(e) => {
+                            e.preventDefault()
+                            onUpdateDayNotes(activeNotesDay.id, { closingNote: suggestion })
+                            setActiveNoteFocus(null)
+                          }}
+                          className="px-3 py-2 text-left hover:bg-accent-soft hover:text-accent border-b border-border/40 last:border-b-0 cursor-pointer font-bold text-[10.5px] text-text"
+                        >
+                          {suggestion}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
@@ -284,7 +377,7 @@ const WeekBoard = ({
                     return (
                       <td
                         key={`${member}-${day.id}`}
-                        onClick={() => setEditingCell({ employee: member, dayId: day.id })}
+                        onClick={() => startEditingCell(member, day.id)}
                         className="px-2.5 sm:px-4 py-4 border-r border-border/30 hover:bg-[rgba(var(--accent-rgb),0.02)] transition-all duration-300 cursor-pointer relative group/cell w-[150px] min-w-[150px] sm:w-[160px] sm:min-w-[160px]"
                         style={{ verticalAlign: 'top', minHeight: '110px' }}
                       >
@@ -301,7 +394,7 @@ const WeekBoard = ({
                                   }}
                                   onClick={(e) => {
                                     e.stopPropagation()
-                                    setEditingCell({ employee: member, dayId: day.id })
+                                    startEditingCell(member, day.id)
                                   }}
                                 >
                                   <div className="flex items-center gap-1.5 font-extrabold text-text mb-0.5 truncate">
@@ -354,9 +447,22 @@ const WeekBoard = ({
       </div>
 
       {/* Glassmorphic Schedule Modal Overlay */}
-      {editingCell ? (() => {
+      {editingCell && typeof document !== 'undefined' ? createPortal((() => {
         const day = week.find((d) => d.id === editingCell.dayId)
         const assignments = day ? getCellAssignments(day, editingCell.employee) : []
+        const otherDays = week.filter((d) => d.id !== editingCell.dayId)
+        
+        const getEmployeeDaySummary = (targetDay) => {
+          const dayAssignments = getCellAssignments(targetDay, editingCell.employee)
+          if (dayAssignments.length === 0) return 'Off'
+          return dayAssignments.map((a) => a.station).join(', ')
+        }
+
+        const handleDuplicateClick = () => {
+          if (!duplicateSourceDayId) return
+          onDuplicateEmployeeShifts(editingCell.employee, duplicateSourceDayId, editingCell.dayId)
+          startEditingCell(null, null)
+        }
         
         return (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 bg-black/45 dark:bg-black/70 backdrop-blur-[6px] transition-all">
@@ -383,7 +489,7 @@ const WeekBoard = ({
                 </div>
                 <button
                   type="button"
-                  onClick={() => setEditingCell(null)}
+                  onClick={() => startEditingCell(null, null)}
                   className="px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-text-muted hover:text-text hover:bg-panel-soft/80 border border-border/60 transition-all text-xs font-black cursor-pointer shadow-sm"
                 >
                   ✕ Close
@@ -454,20 +560,44 @@ const WeekBoard = ({
                         </div>
 
                         <div className="flex flex-col gap-1">
-                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Hours</span>
-                          <input
-                            value={assignment.time}
-                            onChange={(e) => {
-                              onUpdateCellAssignment(
-                                day.id,
-                                assignment.shiftId,
-                                assignment.entryId,
-                                editingCell.employee,
-                                { time: e.target.value }
-                              )
-                            }}
-                            className="input py-1 px-1.5 text-xs bg-panel shadow-sm font-black border"
-                          />
+                          <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Timing</span>
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="time"
+                              value={convert12hTo24h((assignment.time || '').split('-')[0] || '')}
+                              onChange={(e) => {
+                                const start12 = convert24hTo12h(e.target.value) || '12pm';
+                                const currentEnd12 = (assignment.time || '').split('-')[1] || '12pm';
+                                const newRange = `${start12}-${currentEnd12}`;
+                                onUpdateCellAssignment(
+                                  day.id,
+                                  assignment.shiftId,
+                                  assignment.entryId,
+                                  editingCell.employee,
+                                  { time: newRange }
+                                )
+                              }}
+                              className="input py-1 px-1.5 text-xs bg-panel shadow-sm font-black border w-full text-center"
+                            />
+                            <span className="text-text-muted font-black text-xs px-0.5">-</span>
+                            <input
+                              type="time"
+                              value={convert12hTo24h((assignment.time || '').split('-')[1] || '')}
+                              onChange={(e) => {
+                                const currentStart12 = (assignment.time || '').split('-')[0] || '12pm';
+                                const end12 = convert24hTo12h(e.target.value) || '12pm';
+                                const newRange = `${currentStart12}-${end12}`;
+                                onUpdateCellAssignment(
+                                  day.id,
+                                  assignment.shiftId,
+                                  assignment.entryId,
+                                  editingCell.employee,
+                                  { time: newRange }
+                                )
+                              }}
+                              className="input py-1 px-1.5 text-xs bg-panel shadow-sm font-black border w-full text-center"
+                            />
+                          </div>
                         </div>
 
                         <div className="flex flex-col gap-1 sm:col-span-2">
@@ -491,6 +621,44 @@ const WeekBoard = ({
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Duplicate Shifts from Another Day */}
+              <div className="border-t border-border/60 pt-3 sm:pt-4 flex flex-col gap-3">
+                <h4 className="text-[9.5px] sm:text-[10px] font-black text-text-muted uppercase tracking-widest">
+                  Duplicate Shifts from Another Day
+                </h4>
+                <div className="flex gap-2 items-center text-xs">
+                  <select
+                    value={duplicateSourceDayId}
+                    onChange={(e) => setDuplicateSourceDayId(e.target.value)}
+                    className="input py-2 px-2.5 text-xs bg-panel shadow-sm border font-bold flex-grow rounded-xl cursor-pointer"
+                  >
+                    <option value="">Select source day...</option>
+                    {otherDays.map((otherDay) => {
+                      const summary = getEmployeeDaySummary(otherDay)
+                      return (
+                        <option key={otherDay.id} value={otherDay.id}>
+                          {otherDay.name} ({summary})
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <button
+                    type="button"
+                    disabled={!duplicateSourceDayId}
+                    onClick={handleDuplicateClick}
+                    className="btn bg-accent-soft text-accent hover:bg-accent hover:text-white border border-accent/15 rounded-xl text-xs py-2 px-4 font-black transition-all shadow-sm cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed whitespace-nowrap"
+                  >
+                    Copy Shifts
+                  </button>
+                </div>
+                {assignments.length > 0 && duplicateSourceDayId && (
+                  <p className="text-[10.5px] text-primary font-bold flex items-center gap-1.5 px-1 bg-primary/5 border border-primary/10 rounded-lg p-2 mt-0.5">
+                    <InfoIcon className="w-3.5 h-3.5 text-primary shrink-0" />
+                    <span>Copying will overwrite {editingCell.employee}'s current shifts for {day?.name}.</span>
+                  </p>
+                )}
               </div>
 
               {/* Form to Schedule a new/split shift role */}
@@ -517,12 +685,29 @@ const WeekBoard = ({
 
                   <div className="flex flex-col gap-1">
                     <span className="text-text-muted font-extrabold uppercase tracking-wider text-[9px] sm:text-[10px]">Shift Hours / Timing</span>
-                    <input
-                      value={newTime}
-                      onChange={(e) => setNewTime(e.target.value)}
-                      className="input py-1.5 px-2 text-xs bg-panel shadow-sm border font-black"
-                      placeholder="e.g. 12pm-6pm, 9am-9pm"
-                    />
+                    <div className="flex items-center gap-1.5">
+                      <input
+                        type="time"
+                        value={convert12hTo24h((newTime || '').split('-')[0] || '')}
+                        onChange={(e) => {
+                          const start12 = convert24hTo12h(e.target.value) || '12pm';
+                          const currentEnd12 = (newTime || '').split('-')[1] || '12pm';
+                          setNewTime(`${start12}-${currentEnd12}`);
+                        }}
+                        className="input py-1.5 px-2 text-xs bg-panel shadow-sm border font-black w-full text-center"
+                      />
+                      <span className="text-text-muted font-black text-xs px-0.5">-</span>
+                      <input
+                        type="time"
+                        value={convert12hTo24h((newTime || '').split('-')[1] || '')}
+                        onChange={(e) => {
+                          const currentStart12 = (newTime || '').split('-')[0] || '12pm';
+                          const end12 = convert24hTo12h(e.target.value) || '12pm';
+                          setNewTime(`${currentStart12}-${end12}`);
+                        }}
+                        className="input py-1.5 px-2 text-xs bg-panel shadow-sm border font-black w-full text-center"
+                      />
+                    </div>
                   </div>
 
                   <div className="flex flex-col gap-1 col-span-2">
@@ -564,11 +749,10 @@ const WeekBoard = ({
                 </button>
               </div>
 
-              {/* Footer Actions */}
               <div className="border-t border-border/50 pt-3 sm:pt-3.5 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setEditingCell(null)}
+                  onClick={() => startEditingCell(null, null)}
                   className="btn text-xs px-4 sm:px-5 py-1.5 sm:py-2 font-black cursor-pointer"
                 >
                   Done & Close
@@ -578,7 +762,9 @@ const WeekBoard = ({
             </div>
           </div>
         )
-      })() : null}
+      })(), document.body) : null}
+
+
 
     </div>
   )
