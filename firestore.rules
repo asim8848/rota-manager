@@ -2,40 +2,53 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     // ===============================================================
-    // Assumed Data Model & Validations
+    // Security Helper Functions
     // ===============================================================
     
-    // Check if the user is authenticated
+    // Check if the user is authenticated with a valid UID
     function isAuthenticated() {
-      return request.auth != null;
+      return request.auth != null && request.auth.uid != null;
     }
 
-    // Rules
+    // ===============================================================
+    // Rules Configuration
+    // ===============================================================
+
     match /rotas/{weekId} {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated()
+                   // Validate ID pattern (e.g. week_2026-W24)
                    && weekId.matches('^week_[0-9]{4}-W[0-9]{2}$')
                    && request.resource.data.weekId is string
+                   && request.resource.data.weekId.size() <= 20
+                   // Safeguard against Resource Exhaustion / Denial-of-Service
                    && request.resource.data.employees is list
+                   && request.resource.data.employees.size() <= 100
                    && request.resource.data.stations is list
+                   && request.resource.data.stations.size() <= 50
                    && request.resource.data.week is list
+                   && request.resource.data.week.size() <= 7
+                   // Ensure updater ID is correct and not spoofed
                    && (request.resource.data.updatedBy == request.auth.uid || request.resource.data.updatedBy == '');
     }
 
     match /suggestions/notes {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated()
-                   && (request.resource.data.openingNote is list || !('openingNote' in request.resource.data))
-                   && (request.resource.data.prepNote is list || !('prepNote' in request.resource.data))
-                   && (request.resource.data.extraNote is list || !('extraNote' in request.resource.data))
-                   && (request.resource.data.closingNote is list || !('closingNote' in request.resource.data));
+                   // Restrict notes array bounds to prevent DoS attacks
+                   && (request.resource.data.openingNote is list && request.resource.data.openingNote.size() <= 100 || !('openingNote' in request.resource.data))
+                   && (request.resource.data.prepNote is list && request.resource.data.prepNote.size() <= 100 || !('prepNote' in request.resource.data))
+                   && (request.resource.data.extraNote is list && request.resource.data.extraNote.size() <= 100 || !('extraNote' in request.resource.data))
+                   && (request.resource.data.closingNote is list && request.resource.data.closingNote.size() <= 100 || !('closingNote' in request.resource.data));
     }
 
     match /metadata/settings {
       allow read: if isAuthenticated();
       allow write: if isAuthenticated()
-                   && request.resource.data.activeWeekId is string;
+                   && request.resource.data.activeWeekId is string
+                   && request.resource.data.activeWeekId.size() <= 20;
     }
   }
 }
+
 
