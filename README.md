@@ -1,44 +1,66 @@
-# Rota Manager
+# 🍔 Smoke & Pepper Rota Manager
 
-Modern one-page rota manager for restaurant staff scheduling. The app stores data in local storage, generates WhatsApp-ready messages, and exports the weekly rota as text or an image.
+A premium, real-time employee scheduling and roster management platform tailored for restaurant staff and kitchen operations.
 
-## Features
+👉 **Live Application:** [https://rota-manager-5a47.web.app](https://rota-manager-5a47.web.app) (Secure Operations Control)
 
-- Weekly timetable from Monday to Sunday
-- Add/edit/delete staff members
-- Add/edit shifts and station assignments
-- Color-coded stations with icons
-- Auto-calculated weekly hours per employee
-- WhatsApp rota message generator
-- Editable opening/prep/extra/closing notes
-- Export as text or screenshot
-- Light/dark theme toggle
-- Mobile-first responsive layout
+![Smoke & Pepper Rota Manager Dashboard](screenshot.png)
 
-## Tech Stack
+---
 
-- React + Vite
-- Tailwind CSS
-- Local storage persistence
+## 📖 The Problem & Story
 
-## Getting Started
+In a busy kitchen environment like **Smoke & Pepper**, clear coordination is everything. Previously, our kitchen staff, chefs, and manager had a major pain point: **managing and sending the weekly rota manually**. 
 
+The manager had to draft schedules manually, calculate hours on paper, and repeatedly rewrite text schedules to send in the team's WhatsApp group day-in and day-out. It was a tedious, time-consuming manual process that led to scheduling conflicts and miscommunication.
+
+As a member of the kitchen staff and chef, I saw an opportunity to build a digital solution. Using my software development skills, I designed and built this **Rota Manager Web Application** to digitize our scheduling, automate hours calculations, and enable instant, formatted roster sharing.
+
+---
+
+## ⚡ The Solution & Key Features
+
+This application transforms our kitchen scheduling workflow into a streamlined digital experience:
+
+* **🔒 Operations Control (Firebase Auth):** Restricts management actions (adding/removing staff, editing shifts, changing notes) to authenticated managers, ensuring schedule integrity.
+* **🔥 Real-time Database Synchronization (Firestore):** All scheduling changes sync instantly across devices. If the manager updates a shift, the team sees it in real time.
+* **📅 Interactive Weekly Timetable Grid:** Drag/assign staff to color-coded kitchen stations (Supervisor, Grill, Prep, Burger Station, Loaded Station, Till, Fries, Breading, Cleaning, Washing, etc.) from Monday to Sunday.
+* **💬 One-Click WhatsApp Exporter:** Instantly formats the day's or week's rota into a clean, structured, and emoji-decorated text message, copyable with a single click to be pasted directly into our WhatsApp group chat.
+* **📊 Live Workload Dashboard:** Displays real-time metrics including total scheduled hours, most-scheduled staff, and least-scheduled staff to ensure fair distribution of shifts.
+* **📝 Operations & Prep Notes:** Dedicated notes drawer for day-specific instructions (Opening, Prep, Extras, and Closing notes) to keep front-of-house and kitchen teams fully aligned.
+* **🎨 Modern Responsive UI:** A premium glassmorphic interface with optimized mobile layouts, custom micro-interactions, and a native Dark/Light theme toggle.
+
+---
+
+## 🛠️ Tech Stack
+
+* **Frontend:** React 19 + Vite
+* **Styling:** Tailwind CSS (Modern HSL-tailored color systems & Glassmorphism)
+* **Backend:** Firebase Authentication & Cloud Firestore (real-time sync)
+* **Helpers:** HTML2Canvas (for future image-based exports), local storage caching
+
+---
+
+## 🚀 Getting Started
+
+To run the application locally:
+
+### 1. Clone the repository and install dependencies
 ```bash
 npm install
-npm run dev
 ```
 
-## Build
+### 2. Configure Firebase Environment
+Ensure your Firebase Project configuration is set up in [src/firebase.js](src/firebase.js).
 
+### 3. Run the Development Server
+```bash
+npm run dev
+```
+The app will start locally, typically at `http://localhost:5173/`.
+
+### 4. Build for Production
 ```bash
 npm run build
 npm run preview
 ```
-
-## Deployment Suggestions
-
-- Vercel: simple GitHub import, fast previews
-- Netlify: quick drag-and-drop or Git-based deploys
-- Cloudflare Pages: great for performance and free SSL
-
-All three platforms work well with Vite projects. Push the repository to GitHub and connect it to any of the above to deploy in minutes.
