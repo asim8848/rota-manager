@@ -68,6 +68,7 @@ function App() {
   const [selectedWeekId, setSelectedWeekId] = useState(() => getWeekIdentifier())
   const [rota, setRota] = useState(null)
   const [rotaLoading, setRotaLoading] = useState(true)
+  const [rotaError, setRotaError] = useState('')
   const [suggestions, setSuggestions] = useState({ openingNote: [], prepNote: [], extraNote: [], closingNote: [] })
   
   // Theme & Status
@@ -92,11 +93,13 @@ function App() {
     if (!user) {
       setRota((prev) => (prev !== null ? null : prev))
       setRotaLoading((prev) => (prev ? false : prev))
+      setRotaError('')
       return
     }
   /* eslint-enable react-hooks/set-state-in-effect */
 
     setRotaLoading(true)
+    setRotaError('')
     const docRef = doc(db, 'rotas', `week_${selectedWeekId}`)
     
     const unsub = onSnapshot(docRef, async (docSnap) => {
@@ -104,7 +107,7 @@ function App() {
         setRota(docSnap.data())
       } else {
         // Initialize blank week based on default structure
-        const newRota = {
+        const localRota = {
           weekId: selectedWeekId,
           employees: defaultRota.employees,
           stations: defaultRota.stations,
@@ -115,18 +118,27 @@ function App() {
               entries: [] // Start blank
             }))
           })),
-          updatedAt: serverTimestamp(),
           updatedBy: user.uid
         }
+        const newRota = {
+          ...localRota,
+          updatedAt: serverTimestamp(),
+        }
+        setRota(localRota)
         try {
           await setDoc(docRef, newRota)
         } catch (err) {
           console.error("Error creating week:", err)
+          setRotaError('Could not save this week to Firestore. Check manager role and Firestore rules.')
+          setStatus('Firestore save blocked. Showing local rota only.')
+          setTimeout(() => setStatus(''), 5000)
         }
       }
       setRotaLoading(false)
     }, (err) => {
       console.error("Firestore onSnapshot error:", err)
+      setRota(null)
+      setRotaError('Could not load rota from Firestore. Check manager role and Firestore rules.')
       setRotaLoading(false)
     })
 
@@ -783,7 +795,12 @@ function App() {
               )}
             </div>
             
-            {rotaLoading || !rota ? (
+            {rotaError ? (
+              <div className="flex flex-col items-center justify-center py-16 gap-3 bg-panel-soft/30 rounded-2xl border border-dashed border-accent/40 text-center px-6">
+                <span className="text-xs font-black tracking-widest uppercase text-accent">Firestore needs attention</span>
+                <p className="max-w-xl text-sm font-bold text-text-muted">{rotaError}</p>
+              </div>
+            ) : rotaLoading || !rota ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3 bg-panel-soft/30 rounded-2xl border border-dashed border-border/50">
                 <div className="h-8 w-8 animate-spin rounded-full border-4 border-accent border-t-transparent"></div>
                 <span className="text-xs font-black tracking-widest uppercase text-text-muted">Loading Weekly Schedule...</span>

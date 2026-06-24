@@ -49,7 +49,7 @@ service cloud.firestore {
                    && request.resource.data.week.size() <= 7
                    // Ensure updater ID is correct and not spoofed
                    && request.resource.data.updatedBy == request.auth.uid
-                   && request.resource.data.updatedAt is timestamp;
+                   && (request.resource.data.updatedAt is timestamp || request.resource.data.updatedAt is string);
     }
 
     // Suggestions collection - operational notes (manager-only write)
