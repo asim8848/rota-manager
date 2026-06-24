@@ -138,7 +138,7 @@ function App() {
     }, (err) => {
       console.error("Firestore onSnapshot error:", err)
       setRota(null)
-      setRotaError('Could not load rota from Firestore. Check manager role and Firestore rules.')
+      setRotaError(`Could not load rota from Firestore. Signed in as ${user.email || user.uid}. Check that this account has role "manager" in Firestore users.`)
       setRotaLoading(false)
     })
 

@@ -10,12 +10,21 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid != null;
     }
 
-    // Check if user is a manager. User documents are keyed by email address
-    // because roles are manually created in Firebase Console.
+    // Check if user is a manager. Supports role documents keyed by either
+    // email address or Firebase Auth UID.
     function isManager() {
       return isAuthenticated() 
-             && request.auth.token.email is string
-             && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'manager';
+             && (
+               (
+                 request.auth.token.email is string
+                 && exists(/databases/$(database)/documents/users/$(request.auth.token.email))
+                 && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'manager'
+               )
+               || (
+                 exists(/databases/$(database)/documents/users/$(request.auth.uid))
+                 && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'manager'
+               )
+             );
     }
 
     // ===============================================================
@@ -23,8 +32,8 @@ service cloud.firestore {
     // ===============================================================
 
     // User collection - stores manually managed roles and metadata.
-    match /users/{email} {
-      allow read: if isAuthenticated() && request.auth.token.email == email;
+    match /users/{userId} {
+      allow read: if isAuthenticated() && (request.auth.token.email == userId || request.auth.uid == userId);
       allow write: if false;
     }
 
