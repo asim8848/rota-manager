@@ -30,7 +30,8 @@ import {
   doc,
   setDoc,
   getDoc,
-  onSnapshot
+  onSnapshot,
+  serverTimestamp
 } from 'firebase/firestore'
 
 const ResetIcon = ({ className = 'w-4 h-4' }) => (
@@ -114,7 +115,7 @@ function App() {
               entries: [] // Start blank
             }))
           })),
-          updatedAt: new Date().toISOString(),
+          updatedAt: serverTimestamp(),
           updatedBy: user.uid
         }
         try {
@@ -209,7 +210,7 @@ function App() {
       const docRef = doc(db, 'rotas', `week_${selectedWeekId}`)
       await setDoc(docRef, {
         ...nextRota,
-        updatedAt: new Date().toISOString(),
+        updatedAt: serverTimestamp(),
         updatedBy: user?.uid || ''
       })
     } catch (err) {

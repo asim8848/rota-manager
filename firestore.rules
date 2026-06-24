@@ -10,31 +10,53 @@ service cloud.firestore {
       return request.auth != null && request.auth.uid != null;
     }
 
+    // Check if user is a manager. User documents are keyed by email address
+    // because roles are manually created in Firebase Console.
+    function isManager() {
+      return isAuthenticated() 
+             && request.auth.token.email is string
+             && get(/databases/$(database)/documents/users/$(request.auth.token.email)).data.role == 'manager';
+    }
+
     // ===============================================================
     // Rules Configuration
     // ===============================================================
 
+    // User collection - stores manually managed roles and metadata.
+    match /users/{email} {
+      allow read: if isAuthenticated() && request.auth.token.email == email;
+      allow write: if false;
+    }
+
+    // Rotas collection - scheduling data (manager-only write, authenticated read with ownership check)
     match /rotas/{weekId} {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() 
+                   && isManager();
       allow write: if isAuthenticated()
+                   && isManager()
                    // Validate ID pattern (e.g. week_2026-W24)
                    && weekId.matches('^week_[0-9]{4}-W[0-9]{2}$')
                    && request.resource.data.weekId is string
                    && request.resource.data.weekId.size() <= 20
                    // Safeguard against Resource Exhaustion / Denial-of-Service
                    && request.resource.data.employees is list
+                   && request.resource.data.employees.size() > 0
                    && request.resource.data.employees.size() <= 100
                    && request.resource.data.stations is list
+                   && request.resource.data.stations.size() > 0
                    && request.resource.data.stations.size() <= 50
                    && request.resource.data.week is list
                    && request.resource.data.week.size() <= 7
                    // Ensure updater ID is correct and not spoofed
-                   && (request.resource.data.updatedBy == request.auth.uid || request.resource.data.updatedBy == '');
+                   && request.resource.data.updatedBy == request.auth.uid
+                   && request.resource.data.updatedAt is timestamp;
     }
 
+    // Suggestions collection - operational notes (manager-only write)
     match /suggestions/notes {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && isManager();
       allow write: if isAuthenticated()
+                   && isManager()
                    // Restrict notes array bounds to prevent DoS attacks
                    && (request.resource.data.openingNote is list && request.resource.data.openingNote.size() <= 100 || !('openingNote' in request.resource.data))
                    && (request.resource.data.prepNote is list && request.resource.data.prepNote.size() <= 100 || !('prepNote' in request.resource.data))
@@ -42,13 +64,25 @@ service cloud.firestore {
                    && (request.resource.data.closingNote is list && request.resource.data.closingNote.size() <= 100 || !('closingNote' in request.resource.data));
     }
 
+    // Metadata collection - app-wide settings (manager-only)
     match /metadata/settings {
-      allow read: if isAuthenticated();
+      allow read: if isAuthenticated() && isManager();
       allow write: if isAuthenticated()
+                   && isManager()
                    && request.resource.data.activeWeekId is string
-                   && request.resource.data.activeWeekId.size() <= 20;
+                   && request.resource.data.activeWeekId.size() <= 20
+                   && request.resource.data.activeWeekId.matches('^week_[0-9]{4}-W[0-9]{2}$');
+    }
+
+    // Audit log collection - immutable audit trail
+    match /auditLog/{logId} {
+      allow read: if isAuthenticated() && isManager();
+      allow create: if isAuthenticated()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.timestamp == request.time
+                    && request.resource.data.action is string
+                    && request.resource.data.action in ['ROTA_MODIFIED', 'NOTES_MODIFIED', 'STAFF_ADDED', 'STAFF_REMOVED'];
+      allow update, delete: if false;
     }
   }
 }
-
-
